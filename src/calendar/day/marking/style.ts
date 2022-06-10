@@ -17,14 +17,23 @@ export default function styleConstructor(theme: Theme = {}) {
       backgroundColor: appStyle.dotColor
     },
     startingDay: {
-      borderTopLeftRadius: 2,
-      borderBottomLeftRadius: 2,
-      marginLeft: 4
+      borderTopLeftRadius: 5, 
+      borderBottomLeftRadius: 5, 
+      borderLeftWidth: 1
     },
     endingDay: {
-      borderTopRightRadius: 2,
-      borderBottomRightRadius: 2,
-      marginRight: 4
+      borderTopRightRadius: 5, 
+      borderBottomRightRadius: 5, 
+      borderRightWidth: 1
+    },
+    waiting: {
+      flexDirection: 'row', 
+      borderTopWidth: 1, 
+      borderBottomWidth: 1, 
+      height: 8, 
+      borderLeftWidth: 0, 
+      borderRightWidth: 0, 
+      marginTop: 5
     },
     // @ts-expect-error
     ...(theme['stylesheet.marking'] || {})
