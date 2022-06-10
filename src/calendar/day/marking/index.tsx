@@ -1,11 +1,11 @@
 import filter from 'lodash/filter';
-import React, {useRef} from 'react';
-import {View, ViewStyle, TextStyle, StyleProp} from 'react-native';
+import React, { useRef, useState } from 'react';
+import { View, ViewStyle, TextStyle, StyleProp, FlatList } from 'react-native';
 
-import {Theme, MarkingTypes} from '../../../types';
-import {extractComponentProps} from '../../../componentUpdater';
+import { Theme, MarkingTypes } from '../../../types';
+import { extractComponentProps } from '../../../componentUpdater';
 import styleConstructor from './style';
-import Dot, {DotProps} from '../dot';
+import Dot, { DotProps } from '../dot';
 
 export enum Markings {
   DOT = 'dot',
@@ -59,9 +59,11 @@ export interface MarkingProps extends DotProps {
 }
 
 const Marking = (props: MarkingProps) => {
-  const {theme, type, dots, periods, selected, dotColor} = props;
+  const { theme, type, dots, periods, selected, dotColor } = props;
   const style = useRef(styleConstructor(theme));
-
+  const [width, setWidth] = useState(0)
+  const [widthItem, setWidthItem] = useState(0)
+  const [rotateValue, setRotateValue] = useState(0)
   const getItems = (items?: DOT[] | PERIOD[]) => {
     if (items && Array.isArray(items) && items.length > 0) {
       // Filter out items so that we process only those which have color property
@@ -73,6 +75,13 @@ const Marking = (props: MarkingProps) => {
         return type === Markings.MULTI_DOT ? renderDot(index, item) : renderPeriod(index, item);
       });
     }
+  };
+
+  const onPageLayout = (event) => {
+    const { width } = event.nativeEvent.layout;
+    setWidth(width)
+    setWidthItem((width / ((width / 4) | 0)))
+    setRotateValue(((180 * Math.atan((width / ((width / 4) | 0)) / 8)) / (Math.PI)))
   };
 
   const renderMarkingByType = () => {
@@ -87,16 +96,16 @@ const Marking = (props: MarkingProps) => {
   };
 
   const renderMultiMarkings = (containerStyle: object, items?: DOT[] | PERIOD[]) => {
-    return <View style={containerStyle}>{getItems(items)}</View>;
+    return <View style={[containerStyle,]}>{getItems(items)}</View>;
   };
 
   const renderPeriod = (index: number, item: any) => {
-    const {color, startingDay, endingDay} = item;
+    const { color, startingDay, endingDay, isWaiting } = item;
     const styles = [
       style.current.period,
       {
         backgroundColor: color
-      }
+      },
     ];
     if (startingDay) {
       styles.push(style.current.startingDay);
@@ -104,7 +113,17 @@ const Marking = (props: MarkingProps) => {
     if (endingDay) {
       styles.push(style.current.endingDay);
     }
-    return <View key={index} style={styles}/>;
+    return (<View onLayout={onPageLayout} style={[style.current.waiting, { borderColor: color, backgroundColor: isWaiting ? "white" : color },
+    startingDay ? style.current.startingDay : {},
+    endingDay ? style.current.endingDay : {}]}>
+      <FlatList
+        data={[1, 1, 2, 3, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]}
+        horizontal
+        renderItem={({ }) => (
+          <View style={{ width: 1, height: Math.sqrt(8 * 8 + widthItem * widthItem) || 0, transform: [{ rotate: `${rotateValue}deg` }], backgroundColor: color, marginLeft: widthItem || 0 }} />
+        )}
+      />
+    </View>);
   };
 
   const renderDot = (index?: number, item?: any) => {
