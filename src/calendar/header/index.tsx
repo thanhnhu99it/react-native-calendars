@@ -241,7 +241,7 @@ const CalendarHeader = forwardRef((props: CalendarHeaderProps, ref) => {
   const renderDayNames = () => {
     if (!hideDayNames) {
       return (
-        <View style={[style.current.week]} testID={testID ? `${HEADER_DAY_NAMES}-${testID}` : HEADER_DAY_NAMES}>
+        <View style={[style.current.week, {backgroundColor:"#DEDEDE", height: 30, alignItems: 'center', marginTop: 0}]} testID={testID ? `${HEADER_DAY_NAMES}-${testID}` : HEADER_DAY_NAMES}>
           {renderWeekNumbersSpace()}
           {renderWeekDays}
         </View>
