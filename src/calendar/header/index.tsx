@@ -161,7 +161,7 @@ const CalendarHeader = forwardRef((props: CalendarHeaderProps, ref) => {
       }
 
       return (
-        <Text allowFontScaling={false} key={index} style={[dayStyle, {fontSize: 14, textAlign: 'center' ,fontWeight: "600", marginTop: 0, marginBottom: 0, color: index == 6 ?"#EB6559":"#535252"}]} numberOfLines={1} accessibilityLabel={''}>
+        <Text allowFontScaling={false} key={index} style={[dayStyle, {fontSize: 14, textAlign: 'center' ,fontWeight: "800", marginTop: 0, marginBottom: 0, color: index == 6 ?"#EB6559":"#535252"}]} numberOfLines={1} accessibilityLabel={''}>
           {day}
         </Text>
       );
