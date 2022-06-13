@@ -1,66 +1,43 @@
 import {StyleSheet} from 'react-native';
-import * as defaultStyle from '../../../style';
+import * as defaultStyle from '../../style';
 import {Theme} from '../../../types';
-
-const FILLER_HEIGHT = 34;
 
 export default function styleConstructor(theme: Theme = {}) {
   const appStyle = {...defaultStyle, ...theme};
   return StyleSheet.create({
-    wrapper: {
-      alignItems: 'center',
-      alignSelf: 'stretch',
-      marginLeft: -1
+    dots: {
+      flexDirection: 'row'
     },
-    base: {
-      width: 38,
-      height: FILLER_HEIGHT,
-      alignItems: 'center'
+    periods: {
+      alignSelf: 'stretch'
     },
-
-    fillers: {
-      position: 'absolute',
-      height: FILLER_HEIGHT,
-      flexDirection: 'row',
-      left: 0,
-      right: 0
+    period: {
+      height: 4,
+      marginVertical: 1,
+      backgroundColor: appStyle.dotColor
     },
-    leftFiller: {
-      backgroundColor: appStyle.calendarBackground,
-      height: FILLER_HEIGHT,
-      flex: 1
+    startingDay: {
+      borderTopLeftRadius: 5, 
+      borderBottomLeftRadius: 5, 
+      borderLeftWidth: 1,
+      marginLeft: 5
     },
-    rightFiller: {
-      backgroundColor: appStyle.calendarBackground,
-      height: FILLER_HEIGHT,
-      flex: 1
+    endingDay: {
+      borderTopRightRadius: 5, 
+      borderBottomRightRadius: 5, 
+      borderRightWidth: 1,
+      marginRight: 5
     },
-
-    text: {
-      marginTop: 7,
-      fontSize: appStyle.textDayFontSize,
-      fontFamily: appStyle.textDayFontFamily,
-      fontWeight: appStyle.textDayFontWeight,
-      color: appStyle.dayTextColor,
-      backgroundColor: 'rgba(255, 255, 255, 0)'
-    },
-    today: {
-      backgroundColor: appStyle.todayBackgroundColor
-    },
-    todayText: {
-      fontWeight: '500',
-      color: theme.todayTextColor || appStyle.dayTextColor
-    },
-    selectedText: {
-      color: appStyle.selectedDayTextColor
-    },
-    disabledText: {
-      color: appStyle.textDisabledColor
-    },
-    inactiveText: {
-      color: appStyle.textInactiveColor
+    waiting: {
+      flexDirection: 'row', 
+      borderTopWidth: 1, 
+      borderBottomWidth: 1, 
+      height: 8, 
+      borderLeftWidth: 0, 
+      borderRightWidth: 0, 
+      marginTop: 5
     },
     // @ts-expect-error
-    ...(theme['stylesheet.day.period'] || {})
+    ...(theme['stylesheet.marking'] || {})
   });
 }
