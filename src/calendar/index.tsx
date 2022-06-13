@@ -251,7 +251,7 @@ const Calendar = (props: CalendarProps) => {
       <HeaderComponent
         {...headerProps}
         testID={testID}
-        style={headerStyle}
+        style={[headerStyle]}
         ref={ref}
         month={currentMonth}
         addMonth={addMonth}
@@ -269,7 +269,7 @@ const Calendar = (props: CalendarProps) => {
   return (
     <GestureComponent {...gestureProps}>
       <View
-        style={[style.current.container, propsStyle]}
+        style={[style.current.container, propsStyle, {paddingLeft: 0, paddingRight: 0}]}
         accessibilityElementsHidden={accessibilityElementsHidden} // iOS
         importantForAccessibility={importantForAccessibility} // Android
       >
