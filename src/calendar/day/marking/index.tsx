@@ -113,16 +113,11 @@ const Marking = (props: MarkingProps) => {
     if (endingDay) {
       styles.push(style.current.endingDay);
     }
-    return (<View onLayout={onPageLayout} style={[style.current.waiting, { borderColor: color, backgroundColor: isWaiting ? "white" : color },
+    return (<View onLayout={onPageLayout} style={[style.current.waiting, { borderColor: color, backgroundColor: isWaiting ? "white" : color, overflow:'hidden' },
     startingDay ? style.current.startingDay : {},
     endingDay ? style.current.endingDay : {}]}>
-      <FlatList
-        data={[1, 1, 2, 3, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]}
-        horizontal
-        renderItem={({ }) => (
-          <View style={{ width: 1, height: Math.sqrt(8 * 8 + widthItem * widthItem) || 0, transform: [{ rotate: `${rotateValue}deg` }], backgroundColor: color, marginLeft: widthItem || 0 }} />
-        )}
-      />
+      {Array.from(Array(10).keys()).map(() => (
+        <View style={{ width: 1, height: Math.sqrt(8 * 8 + widthItem * widthItem) || 0, transform: [{ rotate: `${rotateValue}deg` }], backgroundColor: color, marginLeft: widthItem || 0 }} />))}
     </View>);
   };
 
