@@ -161,7 +161,7 @@ const CalendarHeader = forwardRef((props: CalendarHeaderProps, ref) => {
       }
 
       return (
-        <Text allowFontScaling={false} key={index} style={dayStyle} numberOfLines={1} accessibilityLabel={''}>
+        <Text allowFontScaling={false} key={index} style={[dayStyle, {fontSize: 14, textAlign: 'center' ,fontWeight: "800", marginTop: 0, marginBottom: 0, color: index == 6 ?"#EB6559":"#535252"}]} numberOfLines={1} accessibilityLabel={''}>
           {day}
         </Text>
       );
@@ -241,7 +241,7 @@ const CalendarHeader = forwardRef((props: CalendarHeaderProps, ref) => {
   const renderDayNames = () => {
     if (!hideDayNames) {
       return (
-        <View style={style.current.week} testID={testID ? `${HEADER_DAY_NAMES}-${testID}` : HEADER_DAY_NAMES}>
+        <View style={[style.current.week, {backgroundColor:"#DEDEDE", height: 30, alignItems: 'center', marginTop: 0}]} testID={testID ? `${HEADER_DAY_NAMES}-${testID}` : HEADER_DAY_NAMES}>
           {renderWeekNumbersSpace()}
           {renderWeekDays}
         </View>
@@ -260,14 +260,6 @@ const CalendarHeader = forwardRef((props: CalendarHeaderProps, ref) => {
       accessibilityElementsHidden={accessibilityElementsHidden} // iOS
       importantForAccessibility={importantForAccessibility} // Android
     >
-      <View style={style.current.header}>
-        {_renderArrow('left')}
-        <View style={style.current.headerContainer}>
-          {_renderHeader()}
-          {renderIndicator()}
-        </View>
-        {_renderArrow('right')}
-      </View>
       {renderDayNames()}
     </View>
   );
