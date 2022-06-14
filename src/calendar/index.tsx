@@ -1,24 +1,24 @@
 import PropTypes from 'prop-types';
 import XDate from 'xdate';
 
-import React, {useRef, useState, useEffect, useCallback} from 'react';
-import {View, ViewStyle, StyleProp} from 'react-native';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { View, ViewStyle, StyleProp } from 'react-native';
 // @ts-expect-error
-import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
+import GestureRecognizer, { swipeDirections } from 'react-native-swipe-gestures';
 
 import constants from '../commons/constants';
-import {page, isGTE, isLTE, sameMonth} from '../dateutils';
-import {xdateToData, parseDate, toMarkingFormat} from '../interface';
-import {getState} from '../day-state-manager';
-import {extractComponentProps} from '../componentUpdater';
+import { page, isGTE, isLTE, sameMonth } from '../dateutils';
+import { xdateToData, parseDate, toMarkingFormat } from '../interface';
+import { getState } from '../day-state-manager';
+import { extractComponentProps } from '../componentUpdater';
 // @ts-expect-error
-import {WEEK_NUMBER} from '../testIDs';
-import {DateData, Theme} from '../types';
+import { WEEK_NUMBER } from '../testIDs';
+import { DateData, Theme } from '../types';
 import styleConstructor from './style';
-import CalendarHeader, {CalendarHeaderProps} from './header';
-import Day, {DayProps} from './day/index';
+import CalendarHeader, { CalendarHeaderProps } from './header';
+import Day, { DayProps } from './day/index';
 import BasicDay from './day/basic';
-import {MarkingProps} from './day/marking';
+import { MarkingProps } from './day/marking';
 
 
 type MarkedDatesType = {
@@ -78,12 +78,12 @@ export interface CalendarProps extends CalendarHeaderProps, DayProps {
  * @gif: https://github.com/wix/react-native-calendars/blob/master/demo/assets/calendar.gif
  */
 const Calendar = (props: CalendarProps) => {
-  const {initialDate, current, theme, disableMonthChange, allowSelectionOutOfRange, minDate, maxDate, onDayPress, onDayLongPress, hideExtraDays, markedDates, firstDay, showSixWeeks, customHeader, headerStyle, displayLoadingIndicator, testID, enableSwipeMonths, accessibilityElementsHidden, importantForAccessibility, onMonthChange, onVisibleMonthsChange, style: propsStyle} = props;
+  const { initialDate, current, theme, disableMonthChange, allowSelectionOutOfRange, minDate, maxDate, onDayPress, onDayLongPress, hideExtraDays, markedDates, firstDay, showSixWeeks, customHeader, headerStyle, displayLoadingIndicator, testID, enableSwipeMonths, accessibilityElementsHidden, importantForAccessibility, onMonthChange, onVisibleMonthsChange, style: propsStyle } = props;
   const [currentMonth, setCurrentMonth] = useState(current || initialDate ? parseDate(current || initialDate) : new XDate());
   const style = useRef(styleConstructor(theme));
   const header = useRef();
   const isMounted = useRef(false);
- 
+
 
   useEffect(() => {
     if (initialDate) {
@@ -131,12 +131,12 @@ const Calendar = (props: CalendarProps) => {
 
   const onPressDay = useCallback((date?: DateData) => {
     if (date)
-    handleDayInteraction(date, onDayPress);
+      handleDayInteraction(date, onDayPress);
   }, [handleDayInteraction, onDayPress]);
 
   const onLongPressDay = useCallback((date?: DateData) => {
     if (date)
-    handleDayInteraction(date, onDayLongPress);
+      handleDayInteraction(date, onDayLongPress);
   }, [handleDayInteraction, onDayLongPress]);
 
   const onSwipeLeft = useCallback(() => {
@@ -150,7 +150,7 @@ const Calendar = (props: CalendarProps) => {
   }, [header]);
 
   const onSwipe = useCallback((gestureName: string) => {
-    const {SWIPE_UP, SWIPE_DOWN, SWIPE_LEFT, SWIPE_RIGHT} = swipeDirections;
+    const { SWIPE_UP, SWIPE_DOWN, SWIPE_LEFT, SWIPE_RIGHT } = swipeDirections;
 
     switch (gestureName) {
       case SWIPE_UP:
@@ -170,7 +170,7 @@ const Calendar = (props: CalendarProps) => {
       <View style={style.current.dayContainer} key={`week-container-${weekNumber}`}>
         <BasicDay
           key={`week-${weekNumber}`}
-          marking={{disabled: true, disableTouchEvent: true}}
+          marking={{ disabled: true, disableTouchEvent: true }}
           // state='disabled'
           theme={theme}
           testID={`${WEEK_NUMBER}-${weekNumber}`}
@@ -246,7 +246,7 @@ const Calendar = (props: CalendarProps) => {
     const ref = customHeader ? undefined : header;
     const CustomHeader = customHeader;
     const HeaderComponent = customHeader ? CustomHeader : CalendarHeader;
-    
+
     return (
       <HeaderComponent
         {...headerProps}
@@ -269,12 +269,13 @@ const Calendar = (props: CalendarProps) => {
   return (
     <GestureComponent {...gestureProps}>
       <View
-        style={[style.current.container, propsStyle]}
         accessibilityElementsHidden={accessibilityElementsHidden} // iOS
         importantForAccessibility={importantForAccessibility} // Android
       >
         {renderHeader()}
-        {renderMonth()}
+        <View style={[style.current.container, propsStyle]}>
+          {renderMonth()}
+        </View>
       </View>
     </GestureComponent>
   );

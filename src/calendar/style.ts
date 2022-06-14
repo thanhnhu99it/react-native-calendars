@@ -6,6 +6,8 @@ export default function getStyle(theme: Theme = {}) {
   const appStyle = {...defaultStyle, ...theme};
   return StyleSheet.create({
     container: {
+      paddingLeft: 5,
+      paddingRight: 5,
       backgroundColor: appStyle.calendarBackground
     },
     dayContainer: {

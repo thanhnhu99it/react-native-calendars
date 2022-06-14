@@ -20,13 +20,11 @@ export default function styleConstructor(theme: Theme = {}) {
       borderTopLeftRadius: 5, 
       borderBottomLeftRadius: 5, 
       borderLeftWidth: 1,
-      marginLeft: 5,
     },
     endingDay: {
       borderTopRightRadius: 5, 
       borderBottomRightRadius: 5, 
       borderRightWidth: 1,
-      marginRight: 5,
     },
     waiting: {
       flexDirection: 'row', 
