@@ -1,197 +1,149 @@
-import XDate from 'xdate';
-import PropTypes from 'prop-types';
-import React, {useCallback, useRef, useMemo} from 'react';
-import {TouchableWithoutFeedback, TouchableOpacity, Text, View, ViewStyle, ViewProps, TextStyle, StyleProp} from 'react-native';
+import filter from 'lodash/filter';
+import React, { useRef, useState } from 'react';
+import { View, ViewStyle, TextStyle, StyleProp, FlatList } from 'react-native';
 
-import {xdateToData} from '../../../interface';
-import {Theme, DayState, DateData} from '../../../types';
+import { Theme, MarkingTypes } from '../../../types';
+import { extractComponentProps } from '../../../componentUpdater';
 import styleConstructor from './style';
-import Dot from '../dot';
-import {MarkingProps} from '../marking';
+import Dot, { DotProps } from '../dot';
 
+export enum Markings {
+  DOT = 'dot',
+  MULTI_DOT = 'multi-dot',
+  PERIOD = 'period',
+  MULTI_PERIOD = 'multi-period',
+  CUSTOM = 'custom'
+}
 
-export interface PeriodDayProps extends ViewProps {
+type CustomStyle = {
+  container?: ViewStyle;
+  text?: TextStyle;
+};
+
+type DOT = {
+  key?: string;
+  color: string;
+  selectedDotColor?: string;
+};
+
+type PERIOD = {
+  color: string;
+  startingDay?: boolean;
+  endingDay?: boolean;
+};
+
+export interface MarkingProps extends DotProps {
+  type?: MarkingTypes;
   theme?: Theme;
-  date?: string;
-  marking?: MarkingProps;
-  state?: DayState;
-  onPress?: (date?: DateData) => void;
-  onLongPress?: (date?: DateData) => void;
+  selected?: boolean;
+  marked?: boolean;
+  today?: boolean;
+  disabled?: boolean;
+  inactive?: boolean;
+  disableTouchEvent?: boolean;
+  activeOpacity?: number;
+  textColor?: string;
+  selectedColor?: string;
+  selectedTextColor?: string;
+  customTextStyle?: StyleProp<TextStyle>;
+  customContainerStyle?: StyleProp<ViewStyle>;
+  dotColor?: string;
+  //multi-dot
+  dots?: DOT[];
+  //multi-period
+  periods?: PERIOD[];
+  startingDay?: boolean;
+  endingDay?: boolean;
   accessibilityLabel?: string;
-  testID?: string;
+  customStyles?: CustomStyle;
 }
 
-type MarkingStyle = {
-  containerStyle: StyleProp<ViewStyle>;
-  textStyle: StyleProp<TextStyle>;
-  startingDay?: ViewStyle;
-  endingDay?: ViewStyle;
-  day?: ViewStyle;
-}
-
-const PeriodDay = (props: PeriodDayProps) => {
-  const {theme, marking, date, onPress, onLongPress, state, accessibilityLabel, testID, children} = props;
-  const dateData = date ? xdateToData(new XDate(date)) : undefined;
+const Marking = (props: MarkingProps) => {
+  const { theme, type, dots, periods, selected, dotColor } = props;
   const style = useRef(styleConstructor(theme));
-
-  const markingStyle = useMemo(() => {
-    const defaultStyle: MarkingStyle = {textStyle: {}, containerStyle: {}};
-
-    if (!marking) {
-      return defaultStyle;
-    } else {
-      if (marking.disabled) {
-        defaultStyle.textStyle = {color: style.current.disabledText.color};
-      } else if (marking.inactive) {
-        defaultStyle.textStyle = {color: style.current.inactiveText.color};
-      } else if (marking.selected) {
-        defaultStyle.textStyle = {color: style.current.selectedText.color};
-      }
-  
-      if (marking.startingDay) {
-        defaultStyle.startingDay = {backgroundColor: marking.color};
-      }
-      if (marking.endingDay) {
-        defaultStyle.endingDay = {backgroundColor: marking.color};
-      }
-      if (!marking.startingDay && !marking.endingDay) {
-        defaultStyle.day = {backgroundColor: marking.color};
-      }
-      
-      if (marking.textColor) {
-        defaultStyle.textStyle = {color: marking.textColor};
-      }
-      if (marking.customTextStyle) {
-        defaultStyle.textStyle = marking.customTextStyle;
-      }
-      if (marking.customContainerStyle) {
-        defaultStyle.containerStyle = marking.customContainerStyle;
-      }
-  
-      return defaultStyle;
-    }
-  }, [marking]);
-
-  const containerStyle = useMemo(() => {
-    const containerStyle = [style.current.base];
-
-    if (state === 'today') {
-      containerStyle.push(style.current.today);
-    }
-
-    if (marking) {
-      containerStyle.push({
-        borderRadius: 17,
-        overflow: 'hidden'
+  const [width, setWidth] = useState(0)
+  const [widthItem, setWidthItem] = useState(0)
+  const [rotateValue, setRotateValue] = useState(0)
+  const getItems = (items?: DOT[] | PERIOD[]) => {
+    if (items && Array.isArray(items) && items.length > 0) {
+      // Filter out items so that we process only those which have color property
+      const validItems = filter(items, function (o: DOT | PERIOD) {
+        return o.color;
       });
-      
-      if (markingStyle.containerStyle) {
-        containerStyle.push(markingStyle.containerStyle);
-      }
 
-      const start = markingStyle.startingDay;
-      const end = markingStyle.endingDay;
-      if (start && !end) {
-        containerStyle.push({backgroundColor: markingStyle.startingDay?.backgroundColor});
-      } else if (end && !start || end && start) {
-        containerStyle.push({backgroundColor: markingStyle.endingDay?.backgroundColor});
-      }
-    }
-    return containerStyle;
-  }, [marking, state]);
-
-  const textStyle = useMemo(() => {
-    const textStyle = [style.current.text];
-
-    if (state === 'disabled') {
-      textStyle.push(style.current.disabledText);
-    } else if (state === 'inactive') {
-      textStyle.push(style.current.inactiveText);
-    } else if (state === 'today') {
-      textStyle.push(style.current.todayText);
-    }
-
-    if (marking) {
-      if (markingStyle.textStyle) {
-        textStyle.push(markingStyle.textStyle);
-      }
-    }
-
-    return textStyle;
-  }, [marking, state]);
-
-  const fillerStyles = useMemo(() => {
-    const leftFillerStyle: ViewStyle = {backgroundColor: undefined};
-    const rightFillerStyle: ViewStyle = {backgroundColor: undefined};
-    let fillerStyle = {};
-
-    const start = markingStyle.startingDay;
-    const end = markingStyle.endingDay;
-
-    if (start && !end) {
-      rightFillerStyle.backgroundColor = markingStyle.startingDay?.backgroundColor;
-    } else if (end && !start) {
-      leftFillerStyle.backgroundColor = markingStyle.endingDay?.backgroundColor;
-    } else if (markingStyle.day) {
-      leftFillerStyle.backgroundColor = markingStyle.day?.backgroundColor;
-      rightFillerStyle.backgroundColor = markingStyle.day?.backgroundColor;
-      fillerStyle = {backgroundColor: markingStyle.day?.backgroundColor};
-    }
-
-    return {leftFillerStyle, rightFillerStyle, fillerStyle};
-  }, [marking]);
-
-  const renderFillers = () => {
-    if (marking) {
-      return (
-        <View style={[style.current.fillers, fillerStyles.fillerStyle]}>
-          <View style={[style.current.leftFiller, fillerStyles.leftFillerStyle]}/>
-          <View style={[style.current.rightFiller, fillerStyles.rightFillerStyle]}/>
-        </View>
-      );
+      return validItems.map((item, index) => {
+        return type === Markings.MULTI_DOT ? renderDot(index, item) : renderPeriod(index, item);
+      });
     }
   };
 
-  const _onPress = useCallback(() => {
-    onPress?.(dateData);
-  }, [onPress]);
+  const onPageLayout = (event) => {
+    const { width } = event.nativeEvent.layout;
+    setWidth(width)
+    setWidthItem((width / ((width / 4) | 0)))
+    setRotateValue(((180 * Math.atan((width / ((width / 4) | 0)) / 8)) / (Math.PI)))
+  };
 
-  const _onLongPress = useCallback(() => {
-    onLongPress?.(dateData);
-  }, [onLongPress]);
-    
-  const Component = marking ? TouchableWithoutFeedback : TouchableOpacity;
-  
-  return (
-    <Component
-      testID={testID}
-      onPress={_onPress}
-      onLongPress={_onLongPress}
-      disabled={marking?.disableTouchEvent}
-      accessible
-      accessibilityRole={marking?.disableTouchEvent ? undefined : 'button'}
-      accessibilityLabel={accessibilityLabel}
-    >
-      <View style={style.current.wrapper}>
-        {renderFillers()}
-        <View style={containerStyle}>
-          <Text allowFontScaling={false} style={textStyle}>
-            {String(children)}
-          </Text>
-          <Dot theme={theme} color={marking?.dotColor} marked={marking?.marked}/>
-        </View>
-      </View>
-    </Component>
-  );
+  const renderMarkingByType = () => {
+    switch (type) {
+      case Markings.MULTI_DOT:
+        return renderMultiMarkings(style.current.dots, dots);
+      case Markings.MULTI_PERIOD:
+        return renderMultiMarkings(style.current.periods, periods);
+      default:
+        return renderDot();
+    }
+  };
+
+  const renderMultiMarkings = (containerStyle: object, items?: DOT[] | PERIOD[]) => {
+    return <View style={[containerStyle,]}>{getItems(items)}</View>;
+  };
+
+  const renderPeriod = (index: number, item: any) => {
+    const { color, startingDay, endingDay, isWaiting } = item;
+    const styles = [
+      style.current.period,
+      {
+        backgroundColor: color
+      },
+    ];
+    if (startingDay) {
+      styles.push(style.current.startingDay);
+    }
+    if (endingDay) {
+      styles.push(style.current.endingDay);
+    }
+    return (<View onLayout={onPageLayout} style={[style.current.waiting, { borderColor: color, backgroundColor: isWaiting ? "white" : color},
+    startingDay ? style.current.startingDay : {},
+    endingDay ? style.current.endingDay : {}]}>
+      <FlatList
+        data={[1, 1, 2, 3, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]}
+        horizontal
+        renderItem={({ }) => (
+          <View style={{ width: 1, height: Math.sqrt(8 * 8 + widthItem * widthItem) || 0, transform: [{ rotate: `${rotateValue}deg` }], backgroundColor: color, marginLeft: widthItem || 0 }} />
+        )}
+      />
+    </View>);
+  };
+
+  const renderDot = (index?: number, item?: any) => {
+    const dotProps = extractComponentProps(Dot, props);
+    let key = index;
+    let color = dotColor;
+
+    if (item) {
+      if (item.key) {
+        key = item.key;
+      }
+      color = selected && item.selectedDotColor ? item.selectedDotColor : item.color;
+    }
+
+    return <Dot {...dotProps} key={key} color={color} />;
+  };
+
+  return renderMarkingByType();
 };
 
-export default PeriodDay;
-PeriodDay.displayName = 'PeriodDay';
-PeriodDay.propTypes = {
-  state: PropTypes.oneOf(['selected', 'disabled', 'inactive', 'today', '']),
-  marking: PropTypes.any,
-  theme: PropTypes.object,
-  onPress: PropTypes.func,
-  onLongPress: PropTypes.func,
-  date: PropTypes.string
-};
+export default Marking;
+Marking.displayName = 'Marking';
+Marking.markings = Markings;
