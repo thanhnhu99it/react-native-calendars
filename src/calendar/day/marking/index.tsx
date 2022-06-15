@@ -1,11 +1,12 @@
 import filter from 'lodash/filter';
-import React, { useRef, useState } from 'react';
-import { View, ViewStyle, TextStyle, StyleProp, FlatList } from 'react-native';
-
-import { Theme, MarkingTypes } from '../../../types';
+import React, { useCallback, useRef, useState } from 'react';
+import { View, ViewStyle, TextStyle, StyleProp, FlatList, TouchableOpacity } from 'react-native';
+import XDate from 'xdate';
+import { Theme, MarkingTypes, DateData } from '../../../types';
 import { extractComponentProps } from '../../../componentUpdater';
 import styleConstructor from './style';
 import Dot, { DotProps } from '../dot';
+import { xdateToData } from 'react-native-calendars/src/interface';
 
 export enum Markings {
   DOT = 'dot',
@@ -56,12 +57,15 @@ export interface MarkingProps extends DotProps {
   endingDay?: boolean;
   accessibilityLabel?: string;
   customStyles?: CustomStyle;
+  date?: string;
+  onPress?: (date?: DateData) => void;
 }
 
 const Marking = (props: MarkingProps) => {
-  const { theme, type, dots, periods, selected, dotColor } = props;
+  const { theme, type, dots, periods, selected, dotColor, onPress, date } = props;
   const style = useRef(styleConstructor(theme));
   const [width, setWidth] = useState(0)
+  const dateData = date ? xdateToData(new XDate(date)) : undefined;
   const [widthItem, setWidthItem] = useState(0)
   const [rotateValue, setRotateValue] = useState(0)
   const getItems = (items?: DOT[] | PERIOD[]) => {
@@ -98,6 +102,9 @@ const Marking = (props: MarkingProps) => {
   const renderMultiMarkings = (containerStyle: object, items?: DOT[] | PERIOD[]) => {
     return <View style={[containerStyle,]}>{getItems(items)}</View>;
   };
+  const _onPress = useCallback(() => {
+    onPress?.(dateData);
+  }, [onPress]);
 
   const renderPeriod = (index: number, item: any) => {
     const { color, startingDay, endingDay, isWaiting } = item;
@@ -113,12 +120,12 @@ const Marking = (props: MarkingProps) => {
     if (endingDay) {
       styles.push(style.current.endingDay);
     }
-    return (<View onLayout={onPageLayout} style={[style.current.waiting, { borderColor: color, backgroundColor: isWaiting ? "white" : color, overflow:'hidden' },
+    return (<TouchableOpacity activeOpacity={0.7} onPress={_onPress} onLayout={onPageLayout} style={[style.current.waiting, { borderColor: color, backgroundColor: isWaiting ? "white" : color, overflow: 'hidden' },
     startingDay ? style.current.startingDay : {},
     endingDay ? style.current.endingDay : {}]}>
       {Array.from(Array(10).keys()).map(() => (
         <View style={{ width: 1, height: Math.sqrt(8 * 8 + widthItem * widthItem) || 0, transform: [{ rotate: `${rotateValue}deg` }], backgroundColor: color, marginLeft: widthItem || 0 }} />))}
-    </View>);
+    </TouchableOpacity>);
   };
 
   const renderDot = (index?: number, item?: any) => {

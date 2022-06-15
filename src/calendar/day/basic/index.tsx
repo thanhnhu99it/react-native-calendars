@@ -138,6 +138,7 @@ const BasicDay = (props: BasicDayProps) => {
 
     return (
       <Marking
+        onPress={_onPress}
         type={markingType}
         theme={theme}
         marked={isMultiDot ? true : marked}
