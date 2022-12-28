@@ -13,10 +13,10 @@ export const textDefaultColor = '#2d4150';
 export const textColor = '#43515c';
 export const textLinkColor = '#00BBF2';
 
-export const textDayFontFamily = size.font.medium;
-export const textMonthFontFamily = size.font.medium;
-export const textDayHeaderFontFamily = size.font.medium;
-export const todayButtonFontFamily = size.font.medium;
+export const textDayFontFamily = size.font.semiBold;
+export const textMonthFontFamily = size.font.semiBold;
+export const textDayHeaderFontFamily = size.font.semiBold;
+export const todayButtonFontFamily = size.font.semiBold;
 
 export const textDayFontWeight = '300';
 export const textMonthFontWeight = '300';
