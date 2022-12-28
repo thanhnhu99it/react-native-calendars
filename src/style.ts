@@ -1,3 +1,5 @@
+import size from "./size";
+
 export const foregroundColor = 'white';
 export const backgroundColor = '#f2F4f5'; // Agenda's reservations bg color
 
@@ -11,10 +13,10 @@ export const textDefaultColor = '#2d4150';
 export const textColor = '#43515c';
 export const textLinkColor = '#00BBF2';
 
-export const textDayFontFamily = 'System';
-export const textMonthFontFamily = 'System';
-export const textDayHeaderFontFamily = 'System';
-export const todayButtonFontFamily = 'System';
+export const textDayFontFamily = size.font.medium;
+export const textMonthFontFamily = size.font.medium;
+export const textDayHeaderFontFamily = size.font.medium;
+export const todayButtonFontFamily = size.font.medium;
 
 export const textDayFontWeight = '300';
 export const textMonthFontWeight = '300';
